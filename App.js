@@ -61,7 +61,7 @@ export default function App() {
       {isLoggedIn ? <Stack.Navigator>
         <Stack.Screen name="Main" component={Main} options={{headerShown: false}}/>
       </Stack.Navigator> :
-      //<Stack.Navigator initialRouteName='Auth'>
+      
       <Stack.Navigator>
       <Stack.Screen name="LR" component={LR} options={{headerShown: false}} />
       

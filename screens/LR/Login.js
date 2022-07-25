@@ -1,11 +1,19 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
-import { useFonts } from 'expo-font';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity,Alert } from 'react-native';
+//import { useFonts } from 'expo-font';
 
 import firebase from 'firebase/app';
 import "firebase/auth";
 
+
+const resultMessages = {
+  "auth/email-already-in-use": "이미 가입된 이메일입니다.",
+  "auth/wrong-password": "잘못된 비밀번호입니다.",
+  "auth/user-not-found": "존재하지 않는 계정입니다.",
+  "auth/invalid-email": "유효하지 않은 이메일 주소입니다.",
+  "auth/weak-password": "비밀번호를 입력해 주세요."
+}
 
 
 function Loginscreen({navigation}) {
@@ -23,6 +31,7 @@ function Loginscreen({navigation}) {
       })
     }
 
+    
     function Login(){
 
       const {email, pwd} = values
@@ -32,8 +41,12 @@ function Loginscreen({navigation}) {
           
       })
       .catch((error) => {
-        alert(error.message)
+        console.log(error.code)
       // ..
+      const alertMessage = resultMessages[error.code] ? 
+      resultMessages[error.code] : "알 수 없는 이유로 로그인에 실패하였습니다.";
+      Alert.alert("로그인 실패", alertMessage);
+
       });
     }
 
@@ -44,8 +57,8 @@ function Loginscreen({navigation}) {
           <Text style={styles.connect}>CONNECT</Text>
         </View>
         <View style={styles.mid}>
-          <Text style={styles.NanumRG}>학번</Text>
-          <TextInput placeholder={"ex) 20171111"} style={styles.input} onChangeText={text => handleChange(text, "email")}/>
+          <Text style={styles.NanumRG}>이메일</Text>
+          <TextInput placeholder={"ex) 20171111@naver.com"} style={styles.input} onChangeText={text => handleChange(text, "email")}/>
           <Text style={styles.NanumRG}>비밀번호</Text>
           <TextInput secureTextEntry ={true} style={styles.input} onChangeText={text => handleChange(text, "pwd")} />
           <TouchableOpacity

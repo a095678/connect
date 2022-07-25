@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, TextInput, TouchableOpacity,Platform} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity,Platform, Alert} from 'react-native';
 
 import CheckBox from 'expo-checkbox';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -9,14 +9,24 @@ import firebase from 'firebase/app';
 import "firebase/auth";
 
 
+const resultMessages = {
+  "auth/email-already-in-use": "이미 가입된 이메일입니다.",
+  "auth/wrong-password": "잘못된 비밀번호입니다.",
+  "auth/user-not-found": "존재하지 않는 계정입니다.",
+  "auth/invalid-email": "유효하지 않은 이메일 주소입니다.",
+  "auth/weak-password": "비밀번호를 6자리 이상 입력해 주세요."
+}
 
-function Register({navigation}) {
+
+function Register({}) {
     const [agree, setAgree] = useState(false);
     const [values, setValues] = useState({
       email: "",
       pwd: "",
       pwd2: ""
-  })
+    })
+    
+    
   function handleChange(text, eventName) {
       setValues(prev => {
           return {
@@ -30,17 +40,27 @@ function Register({navigation}) {
 
     const { email, pwd, pwd2 } = values
 
-    if (pwd == pwd2) {
+    if (pwd == pwd2 && agree) {
         firebase.auth().createUserWithEmailAndPassword(email, pwd)
             .then(() => {
-              
+              Alert.alert("회원가입 성공", "회원가입을 축하드립니다.")
             })
             .catch((error) => {
-                alert(error.message)
+             // console.log(error.code);
                 // ..
+                const alertMessage = resultMessages[error.code] ? 
+                resultMessages[error.code] : "알 수 없는 이유로 회원가입에 실패하였습니다.";
+                console.log(alertMessage)
+                Alert.alert("회원가입 실패", alertMessage)
             });
-    } else {
-        alert("Passwords are different!")
+    } else if (!email){
+        Alert.alert("회원가입 실패","이메일을 입력해 주세요.")
+    } else if(!pwd){
+        Alert.alert("회원가입 실패","비밀번호를 입력해 주세요.") 
+    }else if(pwd != pwd2){
+       Alert.alert("회원가입 실패","비밀번호가 다릅니다.")
+    } else if(!agree){
+        Alert.alert("회원가입 실패","필수 약관을 동의해 주세요.")
     }
 }
 
