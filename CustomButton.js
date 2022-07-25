@@ -13,7 +13,7 @@ const CustomButton = (props) => {
             borderRadius: 10,
             alignItems:"center"
             }}
-            onPress={() => alert('Click!!!')}
+            
         >
             <Text style={{ color: '#000000', fontSize: 24, fontFamily:'NanumGothicBold' }}>{props.title}</Text>
         </TouchableOpacity>

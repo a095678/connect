@@ -2,15 +2,51 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, Alert } from 'react-native';
 import { useFonts } from 'expo-font';
-import CustomButton from './CustomButton';
-import Start from './screens/Start';
-import Register from './screens/Register';
+import LR from './screens/LR';
+import Main from './screens/Main';
+
+
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { createStackNavigator,} from '@react-navigation/stack';
+// import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+import firebase from 'firebase/app';
+import "firebase/auth";
 
 
-function login({navigation}) {
+
+const Stack = createStackNavigator();
+
+export default function App() {
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCnyRbZGJ2wz3tyREaY7Hj56kJSuBFqJwQ",
+    authDomain: "connect-23f9d.firebaseapp.com",
+    databaseURL: "https://connect-23f9d-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "connect-23f9d",
+    storageBucket: "connect-23f9d.appspot.com",
+    messagingSenderId: "689601813910",
+    appId: "1:689601813910:web:d8172d4ff0d85ba310d1b7",
+    measurementId: "G-7G5RRF5PPJ"
+  };
+  //Checking if firebase has been initialized 파이어베이스 초기화 여부 확인
+  if(!firebase.apps.length){
+    firebase.initializeApp(firebaseConfig);
+  }else{
+    firebase.app();
+  }
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user != null) {
+      setIsLoggedIn(true)
+    } else{
+      setIsLoggedIn(false);
+    }
+  });
+
+
+
   const [loaded] = useFonts({  //폰트 설정..
     Audiowide : require('./assets/fonts/AudiowideRegular.ttf'),
     NanumGothic: require('./assets/fonts/NanumGothic.otf'),
@@ -19,40 +55,21 @@ function login({navigation}) {
   if (!loaded) {
     return null;
   }
-  return(
-    <View style={styles.container}>
-      <StatusBar style="auto"></StatusBar>
-      <View style={styles.top}>
-        <Text style={styles.connect}>CONNECT</Text>
-      </View>
-      <View style={styles.mid}>
-        <Text style={styles.NanumRG}>학번</Text>
-        <TextInput placeholder={"ex) 20171111"} style={styles.input}/>
-        <Text style={styles.NanumRG}>비밀번호</Text>
-        <TextInput secureTextEntry ={true} style={styles.input}/>
-        <CustomButton title="로그인"/>
-        <View style={styles.bottom}>
-          <Text style={styles.membership}><Text onPress={()=> navigation.navigate('회원가입')}>회원가입</Text></Text> 
-          <Text style={styles.membership}><Text onPress={()=> navigation.navigate('비밀번호 찾기')}>비밀번호 찾기</Text></Text>  
-          
-        </View>
-      </View>
-    </View>
-  );
-}
 
-const Stack = createStackNavigator();
-
-export default function App() {
- 
   return (
     <NavigationContainer> 
-        <Stack.Navigator initialRouteName='로그인'>
-          <Stack.Screen name="로그인" component={login} options={{headerShown: false}} />
-          <Stack.Screen name="회원가입" component={Register} options={{}}/>
-          <Stack.Screen name="비밀번호 찾기" component={Start}/>
-        </Stack.Navigator>
+      {isLoggedIn ? <Stack.Navigator>
+        <Stack.Screen name="Main" component={Main} options={{headerShown: false}}/>
+      </Stack.Navigator> :
+      //<Stack.Navigator initialRouteName='Auth'>
+      <Stack.Navigator>
+      <Stack.Screen name="LR" component={LR} options={{headerShown: false}} />
+      
+      </Stack.Navigator>
+      }
+        
       </NavigationContainer>
+      
   );
 }
 

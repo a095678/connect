@@ -1,24 +1,63 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, TextInput, TouchableOpacity,KeyboardAvoidingView, Platform} from 'react-native';
-import CustomButton from '../CustomButton';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity,Platform} from 'react-native';
+
 import CheckBox from 'expo-checkbox';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-//import CustomButton from './CustomButton';
+
+import firebase from 'firebase/app';
+import "firebase/auth";
 
 
-function Register() {
+
+function Register({navigation}) {
     const [agree, setAgree] = useState(false);
+    const [values, setValues] = useState({
+      email: "",
+      pwd: "",
+      pwd2: ""
+  })
+  function handleChange(text, eventName) {
+      setValues(prev => {
+          return {
+              ...prev,
+              [eventName]: text
+          }
+      })
+  }
+
+  function SignUp() {
+
+    const { email, pwd, pwd2 } = values
+
+    if (pwd == pwd2) {
+        firebase.auth().createUserWithEmailAndPassword(email, pwd)
+            .then(() => {
+              
+            })
+            .catch((error) => {
+                alert(error.message)
+                // ..
+            });
+    } else {
+        alert("Passwords are different!")
+    }
+}
+
+
+
+
+
     return(
       <KeyboardAwareScrollView style={styles.container } behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <Text style={styles.NanumRG}>학번</Text>
-        <TextInput placeholder={"ex) 20171111"} style={styles.input}/>
+        <TextInput placeholder={"ex) 20171111"} style={styles.input} onChangeText={text => handleChange(text, "email")} />
         <Text style={styles.NanumRG}>이름</Text>
         <TextInput placeholder={"ex) 홍길동"} style={styles.input}/>
         <Text style={styles.NanumRG}>비밀번호</Text>
-        <TextInput secureTextEntry ={true} style={styles.input}/>
+        <TextInput secureTextEntry ={true} style={styles.input} onChangeText={text => handleChange(text, "pwd")}/>
         <Text style={styles.NanumRG}>비밀번호 확인</Text>
-        <TextInput secureTextEntry ={true} style={styles.input}/>
+        <TextInput secureTextEntry ={true} style={styles.input} onChangeText={text => handleChange(text, "pwd2")}/>
         <Text style={styles.NanumRG}>학교 이메일</Text>
         <View style={styles.check}>
           <View style={styles.item1}>
@@ -50,7 +89,25 @@ function Register() {
             </TouchableOpacity>
           </View>
         </View>
-        <CustomButton title="회원가입"/>
+        <TouchableOpacity
+            style={{ 
+            backgroundColor: '#D9D9D9',
+            padding: 15,
+            margin: 20,
+            marginTop: 50,
+            borderRadius: 10,
+            alignItems:"center"
+            }}
+            
+            onPress={()=> SignUp()}
+            /*navigation.reset({    스택 초기화  둘중 뭘해도 다시 돌아가짐 
+                routes: [{
+                name: '이동할 컴포넌트 name',
+                params: { key : value}}] // 보낼 데이터가 있다면
+             }) */
+        >
+            <Text style={{ color: '#000000', fontSize: 24, fontFamily:'NanumGothicBold' }}>회원가입</Text>
+        </TouchableOpacity>
       </KeyboardAwareScrollView>
     );
   }
@@ -113,3 +170,4 @@ function Register() {
 })
 
   export default Register;
+  
